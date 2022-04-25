@@ -16,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.io.IOException;
 
 import static com.example.voucher.domain.voucher.VoucherType.EMPTY;
+import static com.example.voucher.exception.ErrorMessage.FILE_WRITE_ERROR;
 import static com.example.voucher.exception.ErrorMessage.SERVER_ERROR;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
