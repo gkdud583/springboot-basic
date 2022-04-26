@@ -13,7 +13,6 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 
-import java.io.IOException;
 
 import static com.example.voucher.domain.voucher.VoucherType.EMPTY;
 import static com.example.voucher.exception.ErrorMessage.FILE_WRITE_ERROR;
@@ -39,7 +38,7 @@ public class VoucherFileRepositoryTest {
 
             @BeforeEach
             void 테스트_위한_설정() {
-                createdVoucher = new FixedAmountVoucher(null, 1000);
+                createdVoucher = new FixedAmountVoucher(1L, 1000);
             }
 
             @Test
@@ -48,6 +47,8 @@ public class VoucherFileRepositoryTest {
                 try (MockedStatic<FileUtils> mockedStatic = mockStatic(FileUtils.class)) {
                     Voucher savedVoucher = voucherRepository.save(createdVoucher);
                     mockedStatic.verify(() -> FileUtils.writeFile(anyString(), anyString()));
+
+                    assertThat(savedVoucher.getVoucherId()).isEqualTo(createdVoucher.getVoucherId());
                     assertThat(savedVoucher.getDiscountAmount()).isEqualTo(createdVoucher.getDiscountAmount());
                 }
             }
@@ -63,10 +64,10 @@ public class VoucherFileRepositoryTest {
 
                 try (MockedStatic<FileUtils> mockedStatic = mockStatic(FileUtils.class)) {
                     mockedStatic.when(() -> FileUtils.writeFile(anyString(), anyString()))
-                            .thenThrow(new IOException(FILE_WRITE_ERROR.name()));
+                            .thenThrow(new RuntimeException(FILE_WRITE_ERROR.name()));
 
                     assertThatThrownBy(() -> voucherRepository.save(new FixedAmountVoucher(null, 100)))
-                            .isInstanceOf(IOException.class)
+                            .isInstanceOf(RuntimeException.class)
                             .hasMessage(FILE_WRITE_ERROR.name());
                 }
             }
